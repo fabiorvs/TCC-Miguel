@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizador de Logs - Pusher</title>
+    <script src="https://js.pusher.com/7.0/pusher.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        #logs {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .log {
+            background: #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .imagem {
+            max-width: 100%;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Logs de Movimentação</h1>
+    <div id="logs"></div>
+
+    <script>
+        // Configurar Pusher
+        const pusher = new Pusher("36674e0f0e9c186cdb52", {
+            cluster: "us2",
+            encrypted: true
+        });
+
+        // Se inscrever no canal "movimentacao"
+        const channel = pusher.subscribe("movimentacao");
+
+        // Ouvir o evento "novo_log"
+        channel.bind("novo_log", function (data) {
+            const logsContainer = document.getElementById("logs");
+
+            // Criar um novo elemento para o log
+            const logDiv = document.createElement("div");
+            logDiv.classList.add("log");
+
+            // Montar o HTML da mensagem
+            logDiv.innerHTML = `
+                <p><strong>Sensor #${data.sensor_id}</strong></p>
+                <p>${data.mensagem}</p>
+                <p><small>${data.timestamp}</small></p>
+                ${data.imagem ? `<img class="imagem" src="${data.imagem}" alt="Imagem da movimentação">` : ""}
+            `;
+
+            // Adicionar ao topo da lista
+            logsContainer.prepend(logDiv);
+        });
+    </script>
+</body>
+
+</html>
